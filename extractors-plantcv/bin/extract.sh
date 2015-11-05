@@ -1,5 +1,4 @@
 #!/bin/bash
-# usage: extract.sh input_image filename fileid outputdir
 # extract plantcv info from an input image.
 # it calls the appropriate python script in plantcv based on input file
 # name pattern, e.g., VIS_SV_180_z700_379476.jpg will call 
@@ -7,7 +6,7 @@
 # output is stored in a directory named fileid (as input argument).
 # a file .filelist is created to list output files
 # a file .log is created to show a summary of plantcv execution.
-# a file .stdouterr is created to include redirected std , for debug
+# a file .stdouterr is created to include redirected python std, for debug
 
 function nicequit { # nicequit 0, or nicequit 1
   returncode=$1
@@ -24,6 +23,7 @@ fileid="$3"
 odir="$4" #must be absolute path
 if [[ ! -f $infile || -z $filename || -z $fileid || ! -d $odir ]]; then
   echo "Missing arguments or inaccessible paths: $infile $filename $fileid $odir"
+  echo "usage: extract.sh input_image filename fileid outputdir"
   exit 1
 fi
 mkdir -p $odir/$fileid
@@ -37,6 +37,7 @@ if [ -z "$PLANTCV_HOME" ]; then
 fi
 # infile filename != filename
 tdirnum=$RANDOM
+mkdir /tmp/$tdirnum
 cp $infile /tmp/$tdirnum/$filename
 infile=/tmp/$tdirnum/$filename # new infile
 
@@ -58,15 +59,16 @@ pyscript=$PLANTCV_HOME/scripts/image_analysis/$pytype/$pyname
   infolog="$infolog\nERROR: cannot access plantcv script $pyscript" && \
   nicequit 1
 
-python $pyscript -i $infile -o $odir/$fileid/ >$infostd 2>&1
+infolog="$infolog\nEXEC: $pyscript -i $infile -o $odir"
+python $pyscript -i $infile -o $odir >$infostd 2>&1
 [ $? -ne 0 ] && \
   infolog="$infolog\nWARNING: $pyscript did not finish nicely"
 ### check output, create result info
 ofiles=""
-for f in `ls $odir/$fileid/*.jpg`; do
+for f in `ls $odir/*.jpg`; do
   ofiles="$ofiles `basename $f`"
 done
-for f in `ls $odir/$fileid/*.svg`; do
+for f in `ls $odir/*.svg`; do
   jpgf="`basename $f .svg`.jpg"
   convert $f "`dirname $f`/$jpgf"
   ofiles="$ofiles $jpgf"
@@ -75,9 +77,9 @@ if [ -z "$ofiles" ]; then
   infolog="$infolog\nERROR: plantcv did not produce anything." && \
     nicequit 1
 fi
-infolog="$infolog\nplantcv produced $ofiles"
+infolog="$infolog\nOUTPUT: $ofiles"
 for f in $ofiles; do
-  echo "$odir/$fileid/$f" >> $infolst
+  echo "$odir/$f" >> $infolst
 done
 
 T1=`date +%s`
