@@ -79,7 +79,7 @@ def process_file(parameters):
                 mdata['description'] = fcontent
                 mdata['tags'] = ['plantcv', 'image analysis'] 
                 extractors.upload_file_metadata(mdata=mdata, parameters=parameters)
-                extractors.upload_file_tags(mdata=mdata, parameters=parameters)
+                extractors.upload_file_tags(tags=mdata, parameters=parameters)
                 #print "log: " + fcontent 
 
     except Exception :
