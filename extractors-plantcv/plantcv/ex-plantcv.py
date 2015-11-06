@@ -47,7 +47,9 @@ def process_file(parameters):
         else:
             #TODO: if infile not exist, download from REST API
             if not os.path.exists(infile) :
+                logger.info("plantcv: inputfile %s is remote, downloading..." % (infile))
                 infile = download_file(parameters['channel'], parameters['header'], parameters['host'], parameters['secretKey'], parameters['fileid'], parameters['intermediatefileid'], parameters['ext'])
+                logger.info("plantcv: downloaded inputfile is %s." % (infile))
 
             # run command
             str_cmd = "EX-CMD: " + plantcvTool + " " +  infile + " " + filename + " " + fileid + " " + plantcvOutputDir 
