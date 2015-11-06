@@ -50,7 +50,7 @@ toolConvert="convert" # imagemagick convert, optional
 
 ### run plantcv script
 # parse file name pattern
-imgtype=`echo "$filename" | awk -F_ '{print tolower($1) " " tolower($2)}'`
+imgtype=`echo "$filename" | awk -F_ '{print tolower($1) "_" tolower($2)}'`
 if [ $imgtype == "vis_sv" ]; then
   tags=`echo "$filename" | awk -F_ '{print tolower($1) " " tolower($2) " " tolower($4)}'`
 else
