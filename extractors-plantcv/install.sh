@@ -15,5 +15,14 @@ sudo apt-get install -y -q python-pip
 ### user
 yes | pip install virtualenv
 virtualenv pyenv
-source pyenv/bin/activate && pip install pika requests && pip install git+https://opensource.ncsa.illinois.edu/stash/scm/cats/pyclowder.git && deactivate
+source pyenv/bin/activate && pip install pika requests wheel matplotlib && pip install git+https://opensource.ncsa.illinois.edu/stash/scm/cats/pyclowder.git && deactivate
 
+### fix plantcv bugs
+# fix plancv bugs in analyze_color()
+for d in nir_sv vis_sv  vis_tv
+do
+  for f in `ls ${HOME}/plantcv/scripts/image_analysis/$d/*.py`
+  do
+    /bin/sed -i -e "s#'all','rgb'#'all'#" $f
+  done
+done
