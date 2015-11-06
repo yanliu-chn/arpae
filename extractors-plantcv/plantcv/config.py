@@ -27,28 +27,8 @@ sslVerify=False
 
 ### plantcv settings: start
 # plantcv script path
-exRootPath = "/home/clowder/extractor-plantcv"
+exRootPath = "/home/ubuntu/arpae/extractor-plantcv"
 plantcvTool = exRootPath + "/bin/extract.sh"
-plantcvOutputDir = "/home/clowder/output/plantcv"
+plantcvOutputDir = "/home/ubuntu/plantcv-output"
 ### plantcv settings: end
 
-# image generating binary, or None if none is to be generated
-imageBinary = "/usr/local/bin/convert"
-
-# image preview type
-imageType = "png"
-
-# image thumbnail command line
-imageThumbnail = "@BINARY@ @INPUT@ -resize 225^ @OUTPUT@"
-
-# image preview command line
-imagePreview = "@BINARY@ @INPUT@ -resize 800x600 @OUTPUT@"
-
-# type specific preview, or None if none is to be generated
-previewBinary = None
-
-# type preview type
-previewType = None
-
-# type preview command line
-previewCommand = None

@@ -27,56 +27,53 @@ def main():
 # ----------------------------------------------------------------------
 # Process the file and upload the results
 def process_file(parameters):
-    global imageBinary, imageType, imageThumbnail, imagePreview
-    global previewBinary, previewType, previewCommand
-
-    print(parameters['inputfile'])
-
-    if imageBinary:
-        execute_command(parameters, imageBinary, imageThumbnail, imageType, True)
-        execute_command(parameters, imageBinary, imagePreview, imageType, False)
-    if previewBinary:
-        execute_command(parameters, previewBinary, previewCommand, previewType, False)
-
-def execute_command(parameters, binary, commandline, ext, thumbnail=False):
+    global exRootPath, plantcvTool, plantcvOutputDir  
     global logger
 
-    (fd, tmpfile)=tempfile.mkstemp(suffix='.' + ext)
+    infile = parameters['inputfile']
+    filename = parameters['filename']
+    fileid = parameters['fileid']
+    logger.info("plantcv: inputfile=%s filename=%s fileid=%s" % (infile, filename, fileid))
+
     try:
-        # close tempfile
-        os.close(fd)
-        
-        # replace some special tokens
-        commandline = commandline.replace('@BINARY@', binary)
-        commandline = commandline.replace('@INPUT@', parameters['inputfile'])
-        commandline = commandline.replace('@OUTPUT@', tmpfile)
-
-        # split command line
-        p = re.compile(r'''((?:[^ "']|"[^"]*"|'[^']*')+)''')
-        commandline = p.split(commandline)[1::2]
-
-        # execute command
-        x = subprocess.check_output(commandline, stderr=subprocess.STDOUT)
-        if x:
-            logger.debug(binary + " : " + x)
-
-        if(os.path.getsize(tmpfile) != 0):
-            # upload result
-            if thumbnail:
-                extractors.upload_thumbnail(thumbnail=tmpfile, parameters=parameters)
-            else:
-                extractors.upload_preview(previewfile=tmpfile, parameters=parameters)
+        # check if it is plantcv images
+        #TODO: current way is limited. correct way is to check tags
+        if re.match(r"^(VIS|NIR)_(SV|TV)(_\d+)*_z\d+_\d+\.jpg$", filename) is None :
+            logger.info("plantcv: image %s is not my business, skipping...", infile)
         else:
-            log.warn("Extraction resulted in 0 byte file, nothing uploaded.")
+            #TODO: if infile not exist, download from REST API
+            #if not os.path.exists(infile) :
+            #    infile = download_file(channel, header, parameters['host'], parameters['secretKey'], parameters['fileid'], intermediatefileid, ext)
 
-    except subprocess.CalledProcessError as e:
-        logger.error(binary + " : " + str(e.output))
+            # run command
+            success = subprocess.call([plantcvTool, infile, filename, fileid, plantcvOutputDir], shell=False)
+            if (success == 0) :
+                raise Exception("plantcv script %s failed"%(plantcvTool))
+
+            # collect results
+            listfile = plantcvOutputDir + "/" + fileid + "/.filelist"
+            if os.path.exists(listfile) :
+                with open(listfile) as file_outputlist:
+                    fcontent = file_outputlist.readlines()
+                    # upload output files as preview
+                    for ofile in fcontent :
+                        if os.path.exists(ofile) :
+                            extractors.upload_preview(previewfile=ofile, parameters=parameters)
+            # send metadata
+            logfile = plantcvOutputDir + "/" + fileid + "/.log"
+            with open(logfile) as file_log:
+                fcontent = file_log.read()
+                mdata = {}
+                mdata['extractor_id'] = extractorName
+                mdata['generated_from'] = extractors.get_file_URL(fileid, parameters)
+                mdata['description'] = fcontent
+                mdata['tags'] = ['plantcv', 'image analysis'] 
+                extractors.upload_file_metadata(mdata=mdata, parameters=parameters)
+                extractors.upload_file_tags(mdata=mdata, parameters=parameters)
+
+    except Exception as err
+        logger.error(str(err.output))
         raise
-    finally:
-      try:
-        os.remove(tmpfile)
-      except:
-        pass
 
 if __name__ == "__main__":
     main()
