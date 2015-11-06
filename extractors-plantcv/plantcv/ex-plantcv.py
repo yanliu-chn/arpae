@@ -30,7 +30,7 @@ def main():
 def process_file(parameters):
     global exRootPath, plantcvTool, plantcvOutputDir  
     logger = logging.getLogger(extractorName)
-    str_params = pprint.pprint(parameters)
+    str_params = pprint.pformat(parameters)
     logger.info("PARAMETERS: " + str_params) # debug
     print "PARAMETERS: " + str_params # debug
 
