@@ -30,7 +30,9 @@ def main():
 def process_file(parameters):
     global exRootPath, plantcvTool, plantcvOutputDir  
     logger = logging.getLogger(extractorName)
-    pprint.pprint(parameters) # debug
+    str_params = pprint.pprint(parameters)
+    logger.info("PARAMETERS: " + str_params) # debug
+    print "PARAMETERS: " + str_params # debug
 
     infile = parameters['inputfile']
     filename = parameters['filename']
@@ -48,7 +50,9 @@ def process_file(parameters):
             #    infile = download_file(parameters['channel'], parameters['header'], parameters['host'], parameters['secretKey'], parameters['fileid'], parameters['intermediatefileid'], parameters['ext'])
 
             # run command
-            print "EX-CMD: " + plantcvTool + " " +  infile + " " + filename + " " + fileid + " " + plantcvOutputDir + "\n"
+            str_cmd = "EX-CMD: " + plantcvTool + " " +  infile + " " + filename + " " + fileid + " " + plantcvOutputDir 
+            logger.info("plantcv:" + str_cmd)
+            print str_cmd # debug
             success = subprocess.call([plantcvTool, infile, filename, fileid, plantcvOutputDir], shell=False)
             if (success != 0) :
                 raise Exception("plantcv script %s failed"%(plantcvTool))
