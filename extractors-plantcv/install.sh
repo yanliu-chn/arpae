@@ -5,6 +5,10 @@
 # do not run in plantcv docker container
 # if you use anaconda, using virtualenv with it has undefined behavior
 
+### make sure you are in the right directory you want pyenv installed
+[ ! -d $HOME/arpae ] && mkdir $HOME/arpae
+cd $HOME/arpae
+
 ### root
 sudo apt-get install -y -q python-pip 
 

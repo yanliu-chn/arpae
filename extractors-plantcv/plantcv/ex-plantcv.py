@@ -7,6 +7,7 @@ import tempfile
 import re
 from config import *
 import pyclowder.extractors as extractors
+import pprint # debug
 
 def main():
     global extractorName, messageType, rabbitmqExchange, rabbitmqURL, logger
@@ -28,7 +29,8 @@ def main():
 # Process the file and upload the results
 def process_file(parameters):
     global exRootPath, plantcvTool, plantcvOutputDir  
-    global logger
+    logger = logging.getLogger(extractorName)
+    pprint.pprint(parameters) # debug
 
     infile = parameters['inputfile']
     filename = parameters['filename']
@@ -43,9 +45,10 @@ def process_file(parameters):
         else:
             #TODO: if infile not exist, download from REST API
             #if not os.path.exists(infile) :
-            #    infile = download_file(channel, header, parameters['host'], parameters['secretKey'], parameters['fileid'], intermediatefileid, ext)
+            #    infile = download_file(parameters['channel'], parameters['header'], parameters['host'], parameters['secretKey'], parameters['fileid'], parameters['intermediatefileid'], parameters['ext'])
 
             # run command
+            print "EX-CMD: " + plantcvTool + " " +  infile + " " + filename + " " + fileid + " " + plantcvOutputDir + "\n"
             success = subprocess.call([plantcvTool, infile, filename, fileid, plantcvOutputDir], shell=False)
             if (success != 0) :
                 raise Exception("plantcv script %s failed"%(plantcvTool))
@@ -54,11 +57,12 @@ def process_file(parameters):
             listfile = plantcvOutputDir + "/" + fileid + "/.filelist"
             if os.path.exists(listfile) :
                 with open(listfile) as file_outputlist:
-                    fcontent = file_outputlist.readlines()
+                    fcontent = file_outputlist.read().splitlines()
                     # upload output files as preview
                     for ofile in fcontent :
                         if os.path.exists(ofile) :
                             extractors.upload_preview(previewfile=ofile, parameters=parameters)
+                            #print "uploading " + ofile 
             # send metadata
             logfile = plantcvOutputDir + "/" + fileid + "/.log"
             with open(logfile) as file_log:
@@ -70,10 +74,15 @@ def process_file(parameters):
                 mdata['tags'] = ['plantcv', 'image analysis'] 
                 extractors.upload_file_metadata(mdata=mdata, parameters=parameters)
                 extractors.upload_file_tags(mdata=mdata, parameters=parameters)
+                #print "log: " + fcontent 
 
-    except Exception as err
-        logger.error(str(err.output))
+    except Exception :
         raise
 
 if __name__ == "__main__":
     main()
+    #parameters = {}
+    #parameters['inputfile'] = '/home/ubuntu/yanliu/VIS_SV_180_z700_379476.jpg'
+    #parameters['filename'] = 'VIS_SV_180_z700_379476.jpg'
+    #parameters['fileid'] = 'plantcv001'
+    #process_file(parameters)

@@ -27,7 +27,7 @@ sslVerify=False
 
 ### plantcv settings: start
 # plantcv script path
-exRootPath = "/home/ubuntu/arpae/extractor-plantcv"
+exRootPath = "/home/ubuntu/arpae/extractors-plantcv"
 plantcvTool = exRootPath + "/bin/extract.sh"
 plantcvOutputDir = "/home/ubuntu/plantcv-output"
 ### plantcv settings: end
