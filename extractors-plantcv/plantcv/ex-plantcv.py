@@ -37,23 +37,23 @@ def process_file(parameters):
     infile = parameters['inputfile']
     filename = parameters['filename']
     fileid = parameters['fileid']
-    logger.info("plantcv: inputfile=%s filename=%s fileid=%s" % (infile, filename, fileid))
+    logger.info("inputfile=%s filename=%s fileid=%s" % (infile, filename, fileid))
 
     try:
         # check if it is plantcv images
         #TODO: current way is limited. correct way is to check tags
         if re.match(r"^(VIS|NIR)_(SV|TV)(_\d+)*_z\d+_\d+\.jpg$", filename) is None :
-            logger.info("plantcv: image %s is not my business, skipping...", infile)
+            logger.info("image %s is not my business, skipping...", infile)
         else:
             #TODO: if infile not exist, download from REST API
             if not os.path.exists(infile) :
-                logger.info("plantcv: inputfile %s is remote, downloading..." % (infile))
+                logger.info("inputfile %s is remote, downloading..." % (infile))
                 infile = download_file(parameters['channel'], parameters['header'], parameters['host'], parameters['secretKey'], parameters['fileid'], parameters['intermediatefileid'], parameters['ext'])
-                logger.info("plantcv: downloaded inputfile is %s." % (infile))
+                logger.info("downloaded inputfile is %s." % (infile))
 
             # run command
             str_cmd = "EX-CMD: " + plantcvTool + " " +  infile + " " + filename + " " + fileid + " " + plantcvOutputDir 
-            logger.info("plantcv:" + str_cmd)
+            logger.info(str_cmd)
             print str_cmd # debug
             success = subprocess.call([plantcvTool, infile, filename, fileid, plantcvOutputDir], shell=False)
             if (success != 0) :
