@@ -50,15 +50,14 @@ toolConvert="convert" # imagemagick convert, optional
 
 ### run plantcv script
 # parse file name pattern
-imgtype=`echo "$filename" | awk -F_ '{print tolower($1) "_" tolower($2)}'`
-if [ $imgtype == "vis_sv" ]; then
-  tags=`echo "$filename" | awk -F_ '{print tolower($1) " " tolower($2) " " tolower($4)}'`
-else
-  tags=`echo "$filename" | awk -F_ '{print tolower($1) " " tolower($2) " " tolower($3)}'`
-fi
+tags=`echo "$filename" | awk -F_ '{print tolower($1) " " tolower($2) " " tolower($3)} " " tolower($4)}'`
 tagsa=($tags)
 pytype="${tagsa[0]}_${tagsa[1]}"
-pyname="${pytype}_${tagsa[2]}_L1.py"
+if [ $pytype == "vis_sv" ]; then
+  pyname="${pytype}_${tagsa[3]}_L1.py"
+else
+  pyname="${pytype}_${tagsa[2]}_L1.py"
+fi
 pyscript=$PLANTCV_HOME/scripts/image_analysis/$pytype/$pyname
 [ ! -f "$pyscript" ] && \
   infolog="$infolog\nERROR: cannot access plantcv script $pyscript" && \
