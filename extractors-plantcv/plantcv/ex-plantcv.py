@@ -55,7 +55,7 @@ def process_file(parameters):
             str_cmd = "EX-CMD: " + plantcvTool + " " +  infile + " " + filename + " " + fileid + " " + plantcvOutputDir 
             logger.info(str_cmd)
             print str_cmd # debug
-            success = subprocess.call([plantcvTool, infile, filename, fileid, plantcvOutputDir], stdout=subprocess.STDOUT, stderr=subprocess.STDOUT, shell=True)
+            success = subprocess.call([plantcvTool, infile, filename, fileid, plantcvOutputDir], stderr=subprocess.STDOUT, shell=False)
             if (success != 0) :
                 raise Exception("plantcv script %s failed"%(plantcvTool))
 
