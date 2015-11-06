@@ -47,7 +47,7 @@ def process_file(parameters):
 
             # run command
             success = subprocess.call([plantcvTool, infile, filename, fileid, plantcvOutputDir], shell=False)
-            if (success == 0) :
+            if (success != 0) :
                 raise Exception("plantcv script %s failed"%(plantcvTool))
 
             # collect results
