@@ -46,8 +46,8 @@ def process_file(parameters):
             logger.info("plantcv: image %s is not my business, skipping...", infile)
         else:
             #TODO: if infile not exist, download from REST API
-            #if not os.path.exists(infile) :
-            #    infile = download_file(parameters['channel'], parameters['header'], parameters['host'], parameters['secretKey'], parameters['fileid'], parameters['intermediatefileid'], parameters['ext'])
+            if not os.path.exists(infile) :
+                infile = download_file(parameters['channel'], parameters['header'], parameters['host'], parameters['secretKey'], parameters['fileid'], parameters['intermediatefileid'], parameters['ext'])
 
             # run command
             str_cmd = "EX-CMD: " + plantcvTool + " " +  infile + " " + filename + " " + fileid + " " + plantcvOutputDir 
