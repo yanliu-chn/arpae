@@ -26,3 +26,6 @@ do
     /bin/sed -i -e "s#'all','rgb'#'all'#" $f
   done
 done
+
+### prepare output dir
+[ ! -d "$HOME/plantcv-output" ] && mkdir $HOME/plantcv-output
