@@ -85,6 +85,8 @@ infolog="$infolog\nOUTPUT: $ofiles"
 for f in $ofiles; do
   echo "$odir/$f" >> $infolst
 done
+# copy input image to output dir too for jupyter use
+cp "$infile" $odir/
 
 T1=`date +%s`
 infolog="$infolog\nDONE in `expr $T1 \- $T0` seconds."
