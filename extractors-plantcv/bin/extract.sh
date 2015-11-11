@@ -54,17 +54,31 @@ tags=`echo "$filename" | awk -F_ '{print tolower($1) " " tolower($2) " " tolower
 tagsa=($tags)
 pytype="${tagsa[0]}_${tagsa[1]}"
 if [ $pytype == "vis_sv" ]; then
-  pyname="${pytype}_${tagsa[3]}_L1.py"
+  zoom=${tagsa[3]}
 else
-  pyname="${pytype}_${tagsa[2]}_L1.py"
+  zoom=${tagsa[2]}
 fi
-pyscript=$PLANTCV_HOME/scripts/image_analysis/$pytype/$pyname
+pyname="${pytype}_${zoom}_L1.py"
 [ ! -f "$pyscript" ] && \
   infolog="$infolog\nERROR: cannot access plantcv script $pyscript" && \
   nicequit 1
-
-infolog="$infolog\nEXEC: $pyscript -i $infile -o $odir"
-python $pyscript -i $infile -o $odir >$infostd 2>&1
+# find mask
+case "$pytype" in
+  vis_tv)
+    vvv=`echo "$pytype" | awk -F_ '{print $2}'`
+    maskopt="-m $PLANTCV_HOME/masks/$pytype/mask_brass_${vvv}_${zoom}_L1.png"
+    ;;
+  nir_tv)
+    vvv=`echo "$pytype" | awk -F_ '{print $1}'`
+    maskopt="-m $PLANTCV_HOME/masks/$pytype/background_${vvv}_${zoom}.png"
+    ;;
+  *)
+    maskopt="" # vis_sv doesn't need mask, either
+esac
+# call script
+pyscript=$PLANTCV_HOME/scripts/image_analysis/$pytype/$pyname
+infolog="$infolog\nEXEC: $pyscript -i $infile $maskopt -o $odir"
+python $pyscript -i $infile $maskopt -o $odir >$infostd 2>&1
 [ $? -ne 0 ] && \
   infolog="$infolog\nWARNING: $pyscript did not finish nicely"
 ### check output, create result info
