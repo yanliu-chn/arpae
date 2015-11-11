@@ -101,6 +101,7 @@ for f in $ofiles; do
 done
 # copy input image to output dir too for jupyter use
 cp "$infile" $odir/
+chmod +r "$odir/$infile"
 
 T1=`date +%s`
 infolog="$infolog\nDONE in `expr $T1 \- $T0` seconds."
