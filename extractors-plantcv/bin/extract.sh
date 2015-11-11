@@ -59,6 +59,7 @@ else
   zoom=${tagsa[2]}
 fi
 pyname="${pytype}_${zoom}_L1.py"
+pyscript=$PLANTCV_HOME/scripts/image_analysis/$pytype/$pyname
 [ ! -f "$pyscript" ] && \
   infolog="$infolog\nERROR: cannot access plantcv script $pyscript" && \
   nicequit 1
@@ -76,7 +77,6 @@ case "$pytype" in
     maskopt="" # vis_sv doesn't need mask, either
 esac
 # call script
-pyscript=$PLANTCV_HOME/scripts/image_analysis/$pytype/$pyname
 infolog="$infolog\nEXEC: $pyscript -i $infile $maskopt -o $odir"
 python $pyscript -i $infile $maskopt -o $odir >$infostd 2>&1
 [ $? -ne 0 ] && \
